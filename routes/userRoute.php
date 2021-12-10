@@ -12,6 +12,7 @@ Route::get('/emailConfirmation/{token}/{email}', [UserController::class, 'emailv
 
 Route::middleware(['protectedpage'])->group (function()
 {
+    Route::post("/forget", [UserController::class, "forgotPassword"]);
     Route::post("/logout", [UserController::class, "logout"]);
     Route::get("/fetchdata", [UserController::class, "fetchUserProfile"]);
     Route::post("/updatedata/{id}", [UserController::class, "updateUserProfile"]);

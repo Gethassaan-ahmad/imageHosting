@@ -255,6 +255,15 @@ class UserController extends Controller
     }
 
 
-
+    public function forgotPassword(Request $request)
+    {
+        $getToken = $request->bearerToken();
+            $keyValue = config('constant.keyValue');
+            $decoded = JWT::decode($getToken, new Key($keyValue, "HS256"));
+            $userID = $decoded->data;
+            $userExist = Token::where("userID", $userID)->first();
+            if ($userExist) {
+                    dd($userID);
+    }
+    }
 }
-
