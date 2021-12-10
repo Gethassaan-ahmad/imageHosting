@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\loginRequest;
 use App\Http\Requests\registerRequest;
+use App\Mail\forgotpasswordMail;
 use Illuminate\Http\Request;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Mail\sendmail;
 use App\Models\Passwordreset;
 use Illuminate\Support\Facades\Mail;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class UserController extends Controller
 {
@@ -255,36 +257,22 @@ class UserController extends Controller
     }
 
 
-    // public function forgotPassword(Request $request)
-    // {
-        // $getToken = $request->bearerToken();
-        // $keyValue = config('constant.keyValue');
-        // $decoded = JWT::decode($getToken, new Key($keyValue, "HS256"));
-        // $userID = $decoded->data;
-        // $userExist = Token::where("userID", $userID)->first();
-        // if ($userExist) {
-        //     dd($userID);
-        // }
+    public function forgotPassword(Request $request)
+    {
+        $request->validate([
+            'email'=>'required'
+        ]);
 
-    //     $emailToken = $this->emailToken($request->email);
-    //          $url = 'http://127.0.0.1:8000/api/userRoute/emailConfirmation/' . $emailToken . '/' . $request->email;
-    //          Mail::to($request->email)->send(new sendMail($url, $request->name));
-           
-    //          //Create the user
-    //         $user = Passwordreset::create([
-    //            'email' => $request->email,
-    //         ]);
-            
-    //         // dd($user);
-    //         // Mail::to($request['email'])->send(new Sendmail());
-    //         //Generate token for the user
-    //         //$token = $user->createToken('image_hosting')->plainTextToken;
+        $data_store= User::where('email',$request->email)->first();
+        $data_value= time().'%68b';
+        $password= Hash::make($data_value);
+        
+        User::where('email',$data_store->email)->update(['password'=> $password]);
+        Mail::to($request->email)->send(new forgotpasswordMail($request->email,$data_value));
 
-    //         $response = [
-    //             'message' => 'User has been created successfully',
-    //             'user' => $user,
-    //             //'token' => $token
-    //         ];
+        return['email has been send'];
 
-    // }
+    }
+
 }
+

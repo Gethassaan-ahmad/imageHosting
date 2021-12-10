@@ -9,7 +9,7 @@
 <body>
     
     @component('mail::message')
-    <h1 style="text-align: center;"> SocailApp </h1>
+    <h1 style="text-align: center;"> Image Hosting </h1>
     <h3 style="text-transform: capitalize;"> {{ $name }} - Please Confirm your Imagehosting  Account </h3>
     @component('mail::button', ['url' => $url])
     Confirm!

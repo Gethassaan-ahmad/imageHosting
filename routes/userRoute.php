@@ -9,7 +9,7 @@ Route::post("/register", [UserController::class, "register"]);
 Route::post("/login", [UserController::class, "login"]);
 Route::get('/emailConfirmation/{token}/{email}', [UserController::class, 'emailverify']);
 
-Route::post("/forgot", [UserController::class, "forgotPassword"]);
+Route::post("/forgotpassword", [UserController::class, "forgotPassword"]);
 
 
 Route::middleware(['protectedpage'])->group (function()
