@@ -72,7 +72,7 @@ class UserController extends Controller
                 'email' => $fields['email'],
                 'password' => Hash::make($fields['password']),
                 'age' => $fields['age'],
-                // 'image' => $request->file('image')->store('users_images'),
+                'image' => $request->file('image')->store('users_images'),
                 'token' => $emailToken,
                 // 'fatherName'=> $request
             ]);
