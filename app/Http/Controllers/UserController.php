@@ -63,8 +63,8 @@ class UserController extends Controller
             //Validate the fields
             $fields = $request->validated();
             $emailToken = $this->emailToken($request->email);
-             $url = 'http://127.0.0.1:8000/api/emailConfirmation/' . $emailToken . '/' . $request->email;
-             Mail::to($request->email)->send(new sendMail($url, $request->name));
+             $url = 'http://127.0.0.1:8000/api/userRoute/emailConfirmation/' . $emailToken . '/' . $request->email;
+            //  Mail::to($request->email)->send(new sendMail($url, $request->name));
            
              //Create the user
             $user = User::create([
@@ -73,6 +73,7 @@ class UserController extends Controller
                 'password' => Hash::make($fields['password']),
                 'age' => $fields['age'],
                 'image' => $request->file('image')->store('users_images'),
+                'token' => $emailToken,
                 // 'fatherName'=> $request
             ]);
             
@@ -94,22 +95,18 @@ class UserController extends Controller
         }
     }
 
-    public function emailverify($email, $hash)
+    public function emailverify($hash , $email)
     {
-        $user_exist = User::where('email', $email)->first();
-        if (!$user_exist) {
-            return response([
-                'message' => 'Something went wrong',
-            ]);
-        } elseif ($user_exist->email_verified_at != null) {
-            return response([
-                'message' => 'Link has been Expired',
-            ]);
-        } elseif ($user_exist->remember_token != $hash) {
+        // dd($email);
+        $user_exist = User::where('email', $email)->where('token', $hash)->first();
+        // dd($user_exist->token);
+    
+        if ($user_exist->token != $hash) {
             return response([
                 'message' => 'Unauthenticated',
             ]);
-        } else {
+        }
+        if(isset($user_exist)){
             $user_exist->email_verified_at = time();
             $user_exist->save();
             return response([
