@@ -72,7 +72,7 @@ class UserController extends Controller
                 'email' => $fields['email'],
                 'password' => Hash::make($fields['password']),
                 'age' => $fields['age'],
-                'image' => $request->file('image')->store('users_images'),
+                // 'image' => $request->file('image')->store('users_images'),
                 'token' => $emailToken,
                 // 'fatherName'=> $request
             ]);
@@ -171,8 +171,8 @@ class UserController extends Controller
     {
         try {
             $getToken = $request->bearerToken();
-            // $keyValue = config('constant.keyValue');
-            $decoded = JWT::decode($getToken, new Key("image_hosting", "HS256"));
+            $keyValue = config('constant.keyValue');
+            $decoded = JWT::decode($getToken, new Key($keyValue, "HS256"));
             $userID = $decoded->data;
             $userExist = Token::where("userID", $userID)->first();
             if ($userExist) {
