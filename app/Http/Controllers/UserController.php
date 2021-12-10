@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Models\token;
 use Illuminate\Support\Facades\Hash;
 use App\Mail\sendmail;
+use App\Models\Passwordreset;
 use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
@@ -38,22 +39,22 @@ class UserController extends Controller
     function emailToken($data)
     {
         try {
-        date_default_timezone_set('Asia/Karachi');
-        $issued_At = time() + 3600;
-        $key = config('constant.keyValue');
-        $payload = array(
-            "iss" => "http://127.0.0.1:8000",
-            "aud" => "http://127.0.0.1:8000",
-            "iat" => time(),
-            "exp" => $issued_At,
-            "data" => $data,
-        );
-        $jwt = JWT::encode($payload, $key, 'HS256');
-        return $jwt;
-        }catch (Throwable $e) {
-        return $e->getMessage();
+            date_default_timezone_set('Asia/Karachi');
+            $issued_At = time() + 3600;
+            $key = config('constant.keyValue');
+            $payload = array(
+                "iss" => "http://127.0.0.1:8000",
+                "aud" => "http://127.0.0.1:8000",
+                "iat" => time(),
+                "exp" => $issued_At,
+                "data" => $data,
+            );
+            $jwt = JWT::encode($payload, $key, 'HS256');
+            return $jwt;
+        } catch (Throwable $e) {
+            return $e->getMessage();
+        }
     }
-}
 
     public function register(registerRequest $request)
 
@@ -63,10 +64,10 @@ class UserController extends Controller
             //Validate the fields
             $fields = $request->validated();
             $emailToken = $this->emailToken($request->email);
-             $url = 'http://127.0.0.1:8000/api/userRoute/emailConfirmation/' . $emailToken . '/' . $request->email;
-            //  Mail::to($request->email)->send(new sendMail($url, $request->name));
-           
-             //Create the user
+            $url = 'http://127.0.0.1:8000/api/userRoute/emailConfirmation/' . $emailToken . '/' . $request->email;
+            Mail::to($request->email)->send(new sendMail($url, $request->name));
+
+            //Create the user
             $user = User::create([
                 'name' => $fields['name'],
                 'email' => $fields['email'],
@@ -77,7 +78,7 @@ class UserController extends Controller
                 'token' => $emailToken,
                 // 'fatherName'=> $request
             ]);
-            
+
             // dd($user);
             // Mail::to($request['email'])->send(new Sendmail());
             //Generate token for the user
@@ -96,18 +97,18 @@ class UserController extends Controller
         }
     }
 
-    public function emailverify($hash , $email)
+    public function emailverify($hash, $email)
     {
         // dd($email);
         $user_exist = User::where('email', $email)->where('token', $hash)->first();
         // dd($user_exist->token);
-    
+
         if ($user_exist->token != $hash) {
             return response([
                 'message' => 'Unauthenticated',
             ]);
         }
-        if(isset($user_exist)){
+        if (isset($user_exist)) {
             $user_exist->email_verified_at = time();
             $user_exist->save();
             return response([
@@ -139,7 +140,7 @@ class UserController extends Controller
                             'token' => $token,
                         ], 400);
                     }
-                    
+
 
                     // dd($token);
                     // saving token table in db
@@ -220,14 +221,15 @@ class UserController extends Controller
         }
     }
 
-    public function updateUserProfile(Request $request, $id){
+    public function updateUserProfile(Request $request, $id)
+    {
         try {
-            
+
             $user = User::all()->where('id', $id)->first();
             // if (!isset($request->email)) {
             //     $request->email = $request->email;
             //     $request->save();
-                
+
             // }else {
             //     return([
             //         'message'=> 'email dose not change'
@@ -250,20 +252,39 @@ class UserController extends Controller
         } catch (Throwable $e) {
             return $e->getMessage();
         }
-
-        
     }
 
 
-    public function forgotPassword(Request $request)
-    {
-        $getToken = $request->bearerToken();
-            $keyValue = config('constant.keyValue');
-            $decoded = JWT::decode($getToken, new Key($keyValue, "HS256"));
-            $userID = $decoded->data;
-            $userExist = Token::where("userID", $userID)->first();
-            if ($userExist) {
-                    dd($userID);
-    }
-    }
+    // public function forgotPassword(Request $request)
+    // {
+        // $getToken = $request->bearerToken();
+        // $keyValue = config('constant.keyValue');
+        // $decoded = JWT::decode($getToken, new Key($keyValue, "HS256"));
+        // $userID = $decoded->data;
+        // $userExist = Token::where("userID", $userID)->first();
+        // if ($userExist) {
+        //     dd($userID);
+        // }
+
+    //     $emailToken = $this->emailToken($request->email);
+    //          $url = 'http://127.0.0.1:8000/api/userRoute/emailConfirmation/' . $emailToken . '/' . $request->email;
+    //          Mail::to($request->email)->send(new sendMail($url, $request->name));
+           
+    //          //Create the user
+    //         $user = Passwordreset::create([
+    //            'email' => $request->email,
+    //         ]);
+            
+    //         // dd($user);
+    //         // Mail::to($request['email'])->send(new Sendmail());
+    //         //Generate token for the user
+    //         //$token = $user->createToken('image_hosting')->plainTextToken;
+
+    //         $response = [
+    //             'message' => 'User has been created successfully',
+    //             'user' => $user,
+    //             //'token' => $token
+    //         ];
+
+    // }
 }
