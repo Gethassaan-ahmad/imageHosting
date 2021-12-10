@@ -171,8 +171,8 @@ class UserController extends Controller
     {
         try {
             $getToken = $request->bearerToken();
-            $keyValue = config('constant.keyValue');
-            $decoded = JWT::decode($getToken, new Key($keyValue, "HS256"));
+            // $keyValue = config('constant.keyValue');
+            $decoded = JWT::decode($getToken, new Key("image_hosting", "HS256"));
             $userID = $decoded->data;
             $userExist = Token::where("userID", $userID)->first();
             if ($userExist) {
