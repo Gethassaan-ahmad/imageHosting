@@ -130,13 +130,15 @@ class UserController extends Controller
                     // dd(token::all());
                     $isLoggedIn = token::where('userID', $user->id)->first();
                     // dd($isLoggedIn);
-                    if ($isLoggedIn) {
-                        return response([
-                            "message" => "User already logged In"
-                        ], 400);
-                    }
                     // Create Token
                     $token = $this->createToken($user->id);
+                    if ($isLoggedIn) {
+                        return response([
+                            "message" => "User already logged In",
+                            'token' => $token,
+                        ], 400);
+                    }
+                    
 
                     // dd($token);
                     // saving token table in db
