@@ -64,7 +64,7 @@ class UserController extends Controller
             $fields = $request->validated();
             $emailToken = $this->emailToken($request->email);
              $url = 'http://127.0.0.1:8000/api/userRoute/emailConfirmation/' . $emailToken . '/' . $request->email;
-             Mail::to($request->email)->send(new sendMail($url, $request->name));
+            //  Mail::to($request->email)->send(new sendMail($url, $request->name));
            
              //Create the user
             $user = User::create([
